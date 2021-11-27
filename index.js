@@ -1,7 +1,7 @@
 module.exports = {
   package: {
     name: 'fern-sdk',
-    version: '0.0.1'
+    version: '0.0.2'
   },
   Frond: ({
     rootElement,
@@ -140,7 +140,7 @@ module.exports = {
           align-items: center;
           justify-content: center;
           flex-direction: column;
-          z-index: 1000;
+          z-index: 800;
         }
         .frond-wallet {
           display: flex;
