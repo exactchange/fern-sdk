@@ -1,7 +1,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.0.3'
+    version: '0.0.4'
   },
   Frond: ({
     rootElement,
@@ -117,7 +117,7 @@ const FernSDK = window.FernSDK = {
 
       [].forEach.call(
         document.querySelectorAll('.card-list > .card:not(.new)'),
-        element => onClickCard.bind(element)
+        element => onClickCard(element)
       );
     };
 
