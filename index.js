@@ -1,7 +1,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.0.5'
+    version: '0.0.6'
   },
   Frond: ({
     rootElement,
@@ -165,9 +165,86 @@ const FernSDK = window.FernSDK = {
         .frond-wallet > h3 {
           color: white;
         }
+        .card-list {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: flex-start;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+        .card {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          justify-content: center;
+          width: 19rem;
+          height: 12rem;
+          background: linear-gradient(to bottom, #00ffff, #2196f3);
+          margin: 1rem;
+          padding: 2rem;
+          border-radius: 1rem;
+          overflow: hidden;
+        }
+        .card.drv {
+          background: linear-gradient(to bottom, #111, #000);
+        }
+        .card:not(.new) {
+          box-shadow: inset 0 1px rgb(255 255 255 / 50%), 0 2px 1rem rgb(0 10 100);
+        }
+        .card > .number,
+        .card > .details {
+          font-weight: 400;
+          font-family: monospace;
+          text-shadow: 0 1px #1e69b3;
+        }
+        .card > .number {
+          flex: 1;
+          align-self: flex-start;
+        }
+        .card > .details {
+          flex: 1;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          max-height: 36px;
+        }
+        .card.new {
+          display: block;
+          background: transparent;
+          border: 1px dashed white;
+          line-height: 12rem;
+          text-align: center;
+          padding: 0;
+          opacity: .5;
+        }
+        .card.new > button {
+          margin: 0;
+          width: 100%;
+          height: 100%;
+          appearance: none;
+          border: none;
+          background: transparent;
+          color: white;
+        }
+        .card p {
+          margin: 0;
+        }
         @media (max-width: 900px) {
           .frond-wallet-overlay {
             left: 0;
+          }
+          .card-list {
+            display: block;
+          }
+          .card {
+            margin: 2rem auto;
+          }
+          #add-card-overlay {
+            margin: 1rem;
           }
         }
       `;
