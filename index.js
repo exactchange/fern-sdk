@@ -1,7 +1,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.0.4'
+    version: '0.0.5'
   },
   Frond: ({
     rootElement,
@@ -13,6 +13,14 @@ const FernSDK = window.FernSDK = {
       const cardList = document.createElement('ul');
 
       cardList.setAttribute('class', 'card-list');
+
+      if (!cards) {
+        notification.innerHTML = 'No wallet found.';
+        notificationElement.setAttribute('class', 'show error');
+        setTimeout(() => notificationElement.removeAttribute('class'), 5000);
+
+        return;
+      }
 
       cardList.innerHTML = cards.map(card => {
         if (!card?.processor) return;
@@ -146,12 +154,16 @@ const FernSDK = window.FernSDK = {
           display: flex;
           flex-direction: column;
           background: #111;
+          color: white;
           box-shadow: 0 0 1rem black;
           border-radius: 0.5rem;
           border: 1px solid black;
           padding: 1rem;
           margin: 2rem;
           overflow: auto;
+        }
+        .frond-wallet > h3 {
+          color: white;
         }
         @media (max-width: 900px) {
           .frond-wallet-overlay {
@@ -166,8 +178,8 @@ const FernSDK = window.FernSDK = {
         </div>
       `;
 
-      frame.insertBefore(frondWalletOverlayStyles, frame.firstElementChild);
-      frame.insertBefore(frondWalletOverlay, frondWalletOverlayStyles.nextElementSibling);
+      rootElement.insertBefore(frondWalletOverlayStyles, rootElement.firstElementChild);
+      rootElement.insertBefore(frondWalletOverlay, frondWalletOverlayStyles.nextElementSibling);
 
       if (!renderCardList({
         cards,
