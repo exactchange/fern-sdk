@@ -1,7 +1,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.0.9'
+    version: '0.1.0'
   },
   Frond: ({
     rootElement,
@@ -242,7 +242,7 @@ const FernSDK = window.FernSDK = {
         display: block;
         background: transparent;
         border: 1px dashed white;
-        line-height: 12rem;
+        line-height: 10rem;
         text-align: center;
         padding: 0;
         opacity: .5;
