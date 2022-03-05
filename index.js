@@ -1,11 +1,12 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.1.1'
+    version: '0.1.3'
   },
   Frond: ({
     rootElement,
     notificationElement,
+    isAddCardShown = false,
     onClickCard,
     onPayment,
     onSaveCard,
@@ -100,9 +101,10 @@ const FernSDK = window.FernSDK = {
       }
 
       cardList.innerHTML = `
-        <form id="payment-form">
+        <form id="payment-form" class="flex column">
           <div id="card-container"></div>
-          <div id="wallet-container"></div>
+          <h3>Saved Cards</h3>
+          <div id="wallet-container" class="flex start"></div>
           <button id="card-button" type="button">Confirm</button>
         </form>
         <div id="payment-status-container"></div>
@@ -122,7 +124,7 @@ const FernSDK = window.FernSDK = {
 
           return `
             <li class="card ${processor.toLowerCase()}" data-id="${number}">
-              <p class="number">${number}</p>
+              <p class="number">${number.substr(-4)}</p>
               <span class="details">
                 <p>${name}</p>
                 <!-- <img src="${processor.toLowerCase()}" alt="${processor}" width="72" height="36" /> -->
@@ -132,13 +134,15 @@ const FernSDK = window.FernSDK = {
         })
         .join('');
 
-        walletContainer.innerHTML += (`
-          <li class="card new">
-            <button id="add-card">
-              + Add Card
-            </button>
-          </li>
-        `);
+        if (isAddCardShown) {
+          walletContainer.innerHTML += (`
+            <li class="card new">
+              <button id="add-card">
+                + Add Card
+              </button>
+            </li>
+          `);
+        }
 
         if (parentElement) {
           parentElement.innerHTML = `
@@ -158,7 +162,6 @@ const FernSDK = window.FernSDK = {
     const bindCardListEvents = async ({ cards }) => {
       await SquareSDK.bindCardEvents();
 
-      const addCardButton = document.getElementById('add-card');
       const saveCardButton = document.getElementById('save-card');
       const overlay = document.querySelector('#overlay');
 
@@ -194,16 +197,20 @@ const FernSDK = window.FernSDK = {
         requestAnimationFrame(onClickCloseOverlay);
       };
 
-      const onClickAddCard = () => {
-        overlay.setAttribute('class', 'show');
+      if (isAddCardShown) {
+        const addCardButton = document.getElementById('add-card');
 
-        requestAnimationFrame(() => {
-          rootElement.onclick = onClickOutsideOverlay;
-          saveCardButton.onclick = onClickSaveCard;
-        });
-      };
+        const onClickAddCard = () => {
+          overlay.setAttribute('class', 'show');
 
-      addCardButton.onclick = onClickAddCard;
+          requestAnimationFrame(() => {
+            rootElement.onclick = onClickOutsideOverlay;
+            saveCardButton.onclick = onClickSaveCard;
+          });
+        };
+
+        addCardButton.onclick = onClickAddCard;
+      }
 
       const walletOverlay = document.querySelector('.frond-wallet-overlay');
 
@@ -279,9 +286,13 @@ const FernSDK = window.FernSDK = {
         padding: 1rem;
         margin: 2rem;
         overflow: auto;
+        width: 30rem;
+        max-width: 75%;
       }
-      .frond-wallet > h3 {
+      .frond-wallet h3 {
         color: white;
+        align-self: flex-start;
+        text-align: left;
       }
       .card-list {
         display: flex;
@@ -294,13 +305,14 @@ const FernSDK = window.FernSDK = {
       }
       .card {
         display: flex;
-        flex-direction: column;
         align-items: flex-end;
         justify-content: center;
-        width: 15rem;
-        height: 10rem;
+        width: 9rem;
+        height: 6rem;
+        max-width: 9rem;
+        max-height: 6rem;
         background: linear-gradient(to bottom, #00ffff, #2196f3);
-        margin: 1rem;
+        margin: 1rem .5rem;
         padding: 1rem;
         border-radius: 1rem;
         overflow: hidden;
@@ -330,11 +342,17 @@ const FernSDK = window.FernSDK = {
         width: 100%;
         max-height: 36px;
       }
+      .card > .number p,
+      .card > .details p {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
       .card.new {
         display: block;
         background: transparent;
         border: 1px dashed white;
-        line-height: 10rem;
+        line-height: 6rem;
         text-align: center;
         padding: 0;
         opacity: .5;
@@ -350,6 +368,17 @@ const FernSDK = window.FernSDK = {
       }
       .card p {
         margin: 0;
+      }
+      .sq-card-wrapper .sq-card-message-no-error {
+        color: white;
+      }
+      .sq-card-wrapper .sq-card-message-no-error::before {
+        background-color: white;
+      }
+      #payment-form,
+      #card-container,
+      #wallet-container {
+        width: 100%;
       }
       #overlay {
         display: none;
