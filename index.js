@@ -1,7 +1,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.1.9'
+    version: '0.2.0'
   },
   Frond: ({
     rootElement,
@@ -98,6 +98,11 @@ const FernSDK = window.FernSDK = {
         notification.innerHTML = 'No wallet found.';
         notificationElement.setAttribute('class', 'show error');
         setTimeout(() => notificationElement.removeAttribute('class'), 5000);
+
+        const frondWalletOverlay = document.querySelector('.frond-wallet-overlay');
+
+        frondWalletOverlay.setAttribute('class', 'frond-wallet-overlay');
+        rootElement.onclick = null;
 
         return;
       }
