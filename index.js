@@ -1,19 +1,19 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.1.3'
+    version: '0.1.6'
   },
   Frond: ({
     rootElement,
     notificationElement,
-    isAddCardShown = false,
+    walletOnly = false,
     onClickCard,
     onPayment,
     onSaveCard,
     squareAppId,
     squareLocationId
   }) => {
-    const SquareSDK = {
+    const SquareSDK = walletOnly ? false : {
       tokenize: async paymentMethod => {
         const tokenResult = await paymentMethod.tokenize();
 
@@ -85,7 +85,9 @@ const FernSDK = window.FernSDK = {
       }
     };
 
-    SquareSDK.initialize();
+    if (SquareSDK) {
+      SquareSDK.initialize();
+    }
 
     const renderCardList = async ({ cards, parentElement }) => {
       const cardList = document.createElement('ul');
@@ -103,9 +105,9 @@ const FernSDK = window.FernSDK = {
       cardList.innerHTML = `
         <form id="payment-form" class="flex column">
           <div id="card-container"></div>
-          <h3>Saved Cards</h3>
+          <h3>Saved cards</h3>
           <div id="wallet-container" class="flex start"></div>
-          <button id="card-button" type="button">Confirm</button>
+          ${walletOnly ? '' : '<button id="card-button" type="button">Confirm</button>'}
         </form>
         <div id="payment-status-container"></div>
       `;
@@ -134,7 +136,7 @@ const FernSDK = window.FernSDK = {
         })
         .join('');
 
-        if (isAddCardShown) {
+        if (walletOnly) {
           walletContainer.innerHTML += (`
             <li class="card new">
               <button id="add-card">
@@ -146,7 +148,7 @@ const FernSDK = window.FernSDK = {
 
         if (parentElement) {
           parentElement.innerHTML = `
-            <h3>Payment Method</h3>
+            ${walletOnly ? '' : '<h3>Card details</h3>'}
             ${cardList.outerHTML}
           `;
         }
@@ -160,7 +162,9 @@ const FernSDK = window.FernSDK = {
     };
 
     const bindCardListEvents = async ({ cards }) => {
-      await SquareSDK.bindCardEvents();
+      if (SquareSDK) {
+        await SquareSDK.bindCardEvents();
+      }
 
       const saveCardButton = document.getElementById('save-card');
       const overlay = document.querySelector('#overlay');
@@ -197,10 +201,11 @@ const FernSDK = window.FernSDK = {
         requestAnimationFrame(onClickCloseOverlay);
       };
 
-      if (isAddCardShown) {
+      if (walletOnly) {
         const addCardButton = document.getElementById('add-card');
 
-        const onClickAddCard = () => {
+        const onClickAddCard = event => {
+          event.preventDefault();
           overlay.setAttribute('class', 'show');
 
           requestAnimationFrame(() => {
@@ -262,7 +267,7 @@ const FernSDK = window.FernSDK = {
       .frond-wallet-overlay {
         display: none;
         position: fixed;
-        background: rgba(0, 0, 0, .8);
+        background: rgba(0, 0, 0, .5);
         left: 220px;
         right: 0;
         top: 0;
@@ -280,9 +285,8 @@ const FernSDK = window.FernSDK = {
         flex-direction: column;
         background: #111;
         color: white;
-        box-shadow: 0 0 1rem black;
+        box-shadow: 0 0 5rem black;
         border-radius: 0.5rem;
-        border: 1px solid black;
         padding: 1rem;
         margin: 2rem;
         overflow: auto;
@@ -407,6 +411,7 @@ const FernSDK = window.FernSDK = {
         padding: 1rem;
         border: 1px solid black;
         border-radius: 1rem;
+        min-height: 20rem;
       }
       #add-card-overlay > input,
       #save-card {
