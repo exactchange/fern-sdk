@@ -1,14 +1,91 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.1.0'
+    version: '0.1.1'
   },
   Frond: ({
     rootElement,
     notificationElement,
     onClickCard,
-    onSaveCard
+    onPayment,
+    onSaveCard,
+    squareAppId,
+    squareLocationId
   }) => {
+    const SquareSDK = {
+      tokenize: async paymentMethod => {
+        const tokenResult = await paymentMethod.tokenize();
+
+        if (tokenResult.status === 'OK') {
+          return tokenResult.token;
+        } else {
+          let errorMessage = `Tokenization failed-status: ${tokenResult.status}`;
+
+          if (tokenResult.errors) {
+            errorMessage += ` and errors: ${JSON.stringify(
+              tokenResult.errors
+            )}`;
+          }
+
+          throw new Error(errorMessage);
+        }
+      },
+
+      bindCardEvents: async () => {
+        if (!window.Square) {
+          throw new Error('Square failed to load.');
+        }
+
+        const payments = window.Square.payments(SquareSDK.appId, SquareSDK.locationId);
+        let card;
+
+        try {
+          card = await SquareSDK.initializeCard(payments);
+        } catch (error) {
+          console.error(error);
+
+          return;
+        }
+
+        const handlePaymentMethodSubmission = async (event, paymentMethod) => {
+          event.preventDefault();
+
+          try {
+            cardButton.disabled = true;
+
+            const token = await SquareSDK.tokenize(paymentMethod);
+
+            onPayment({ cardNumber: false, squareToken: token });
+          } catch (error) {
+            cardButton.disabled = false;
+
+            console.error(error.message);
+          }
+        }
+
+        const cardButton = document.getElementById('card-button');
+
+        cardButton.addEventListener('click', async event => (
+          handlePaymentMethodSubmission(event, card)
+        ));
+      },
+
+      initializeCard: async payments => {
+        const card = await payments.card();
+
+        await card.attach('#card-container');
+
+        return card;
+      },
+
+      initialize: () => {
+        SquareSDK.appId = squareAppId;
+        SquareSDK.locationId = squareLocationId;
+      }
+    };
+
+    SquareSDK.initialize();
+
     const renderCardList = async ({ cards, parentElement }) => {
       const cardList = document.createElement('ul');
 
@@ -22,50 +99,65 @@ const FernSDK = window.FernSDK = {
         return;
       }
 
-      cardList.innerHTML = cards.map(card => {
-        if (!card?.processor) return;
+      cardList.innerHTML = `
+        <form id="payment-form">
+          <div id="card-container"></div>
+          <div id="wallet-container"></div>
+          <button id="card-button" type="button">Confirm</button>
+        </form>
+        <div id="payment-status-container"></div>
+      `;
 
-        const {
-          name,
-          number,
-          processor
-        } = card;
+      requestAnimationFrame(() => {
+        const walletContainer = cardList.querySelector('#wallet-container');
 
-        return `
-          <li class="card ${processor.toLowerCase()}" data-id="${number}">
-            <p class="number">${number}</p>
-            <span class="details">
-              <p>${name}</p>
-              <!-- <img src="${processor.toLowerCase()}" alt="${processor}" width="72" height="36" /> -->
-            </span>
+        walletContainer.innerHTML += cards.map(card => {
+          if (!card?.processor) return;
+
+          const {
+            name,
+            number,
+            processor
+          } = card;
+
+          return `
+            <li class="card ${processor.toLowerCase()}" data-id="${number}">
+              <p class="number">${number}</p>
+              <span class="details">
+                <p>${name}</p>
+                <!-- <img src="${processor.toLowerCase()}" alt="${processor}" width="72" height="36" /> -->
+              </span>
+            </li>
+          `;
+        })
+        .join('');
+
+        walletContainer.innerHTML += (`
+          <li class="card new">
+            <button id="add-card">
+              + Add Card
+            </button>
           </li>
-        `;
-      })
-      .join('');
+        `);
 
-      cardList.innerHTML += (`
-        <li class="card new">
-          <button id="add-card">
-            + Add Card
-          </button>
-        </li>
-      `);
+        if (parentElement) {
+          parentElement.innerHTML = `
+            <h3>Payment Method</h3>
+            ${cardList.outerHTML}
+          `;
+        }
 
-      if (parentElement) {
-        parentElement.innerHTML = `
-          <h3>Payment Method</h3>
-          ${cardList.outerHTML}
-        `;
-      }
-
-      requestAnimationFrame(
-        bindCardListEvents.bind(this, { cards })
-      );
+        requestAnimationFrame(
+          bindCardListEvents.bind(this, { cards })
+        );
+      });
 
       return true;
     };
 
-    const bindCardListEvents = ({ cards }) => {
+    const bindCardListEvents = async ({ cards }) => {
+      await SquareSDK.bindCardEvents();
+
       const addCardButton = document.getElementById('add-card');
       const saveCardButton = document.getElementById('save-card');
       const overlay = document.querySelector('#overlay');
