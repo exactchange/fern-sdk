@@ -1,7 +1,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.1.6'
+    version: '0.1.9'
   },
   Frond: ({
     rootElement,
@@ -229,8 +229,8 @@ const FernSDK = window.FernSDK = {
       };
 
       [].forEach.call(
-        document.querySelectorAll('.card-list > .card:not(.new)'),
-        element => onClickCard(element)
+        document.querySelectorAll('#wallet-container > .card:not(.new)'),
+        element => element.onclick = onClickCard(element)
       );
     };
 
@@ -259,7 +259,7 @@ const FernSDK = window.FernSDK = {
 
     frondWalletOverlay.innerHTML = `
       <div class="frond-wallet">
-        <h3>Payment Method</h3>
+        <h3>Card details</h3>
       </div>
     `;
 
@@ -383,6 +383,14 @@ const FernSDK = window.FernSDK = {
       #card-container,
       #wallet-container {
         width: 100%;
+      }
+      #card-button {
+        background: white;
+        color: black;
+        border-radius: 100vw;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
       }
       #overlay {
         display: none;
