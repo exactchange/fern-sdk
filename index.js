@@ -1,7 +1,10 @@
+/* eslint-disable no-magic-numbers */
+
+// eslint-disable-next-line no-unused-vars
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.2.0'
+    version: '0.2.6'
   },
   Frond: ({
     rootElement,
@@ -19,17 +22,17 @@ const FernSDK = window.FernSDK = {
 
         if (tokenResult.status === 'OK') {
           return tokenResult.token;
-        } else {
-          let errorMessage = `Tokenization failed-status: ${tokenResult.status}`;
-
-          if (tokenResult.errors) {
-            errorMessage += ` and errors: ${JSON.stringify(
-              tokenResult.errors
-            )}`;
-          }
-
-          throw new Error(errorMessage);
         }
+
+        let errorMessage = `Tokenization failed-status: ${tokenResult.status}`;
+
+        if (tokenResult.errors) {
+          errorMessage += ` and errors: ${JSON.stringify(
+            tokenResult.errors
+          )}`;
+        }
+
+        throw new Error(errorMessage);
       },
 
       bindCardEvents: async () => {
@@ -62,7 +65,7 @@ const FernSDK = window.FernSDK = {
 
             console.error(error.message);
           }
-        }
+        };
 
         const cardButton = document.getElementById('card-button');
 
@@ -139,7 +142,7 @@ const FernSDK = window.FernSDK = {
             </li>
           `;
         })
-        .join('');
+          .join('');
 
         if (walletOnly) {
           walletContainer.innerHTML += (`
@@ -295,7 +298,7 @@ const FernSDK = window.FernSDK = {
         padding: 1rem;
         margin: 2rem;
         overflow: auto;
-        width: 30rem;
+        width: 32rem;
         max-width: 75%;
       }
       .frond-wallet h3 {
@@ -456,6 +459,10 @@ const FernSDK = window.FernSDK = {
         .frond-wallet-overlay {
           left: 0;
         }
+        .frond-wallet {
+          width: auto;
+          padding: 3rem;
+        }
         .card-list {
           display: block;
         }
@@ -464,6 +471,9 @@ const FernSDK = window.FernSDK = {
         }
         #add-card-overlay {
           margin: 1rem;
+        }
+        #wallet-container.flex.start {
+          display: block;
         }
       }
     `;
@@ -490,5 +500,41 @@ const FernSDK = window.FernSDK = {
       onShow
     }
   },
-  Payments: () => {}
+  Payments: ({ usdBalance = 0, onPayout }) => ({
+    onPayout,
+    onShow: () => {
+      const payments = document.getElementById('payments');
+      const payoutButton = document.createElement('button');
+
+      payoutButton.innerHTML = `Withdraw ($${usdBalance.toFixed(2)})`;
+      payoutButton.setAttribute('class', 'fern-payout-button');
+
+      payoutButton.setAttribute('style', `
+        position: fixed;
+        z-index: 100;
+        top: 1rem;
+        right: 1rem;
+        appearance: none;
+        border: none;
+        background: white;
+        color: black;
+        border-radius: 100vw;
+        padding: .5rem 1rem;
+      `);
+
+      payments.appendChild(payoutButton);
+
+      requestAnimationFrame(() => {
+        const onClick = async ({ target }) => {
+          await onPayout({
+            element: target
+          });
+
+          payoutButton.onclick = onClick;
+        };
+
+        payoutButton.onclick = onClick;
+      });
+    }
+  })
 };
