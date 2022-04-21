@@ -4,7 +4,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.2.6'
+    version: '0.2.7'
   },
   Frond: ({
     rootElement,
@@ -498,7 +498,7 @@ const FernSDK = window.FernSDK = {
 
     return {
       onShow
-    }
+    };
   },
   Payments: ({ usdBalance = 0, onPayout }) => ({
     onPayout,
