@@ -4,7 +4,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.2.7'
+    version: '0.2.8'
   },
   Frond: ({
     rootElement,
@@ -380,6 +380,10 @@ const FernSDK = window.FernSDK = {
       }
       .card p {
         margin: 0;
+      }
+      .sq-card-wrapper,
+      #card-container {
+        max-width: 100%;
       }
       .sq-card-wrapper .sq-card-message-no-error {
         color: white;
