@@ -4,7 +4,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.2.9'
+    version: '0.3.0'
   },
   Frond: ({
     rootElement,
@@ -508,7 +508,7 @@ const FernSDK = window.FernSDK = {
   Payments: ({ usdBalance = 0, onPayout }) => ({
     onPayout,
     onShow: () => {
-      const payments = document.getElementById('payments');
+      const payments = document.getElementById('spore');
       const payoutButton = document.createElement('button');
 
       payoutButton.innerHTML = `Withdraw ($${usdBalance.toFixed(2)})`;
