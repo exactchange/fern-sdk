@@ -4,7 +4,7 @@
 const FernSDK = window.FernSDK = {
   package: {
     name: 'fern-sdk',
-    version: '0.3.0'
+    version: '0.3.2'
   },
   Frond: ({
     rootElement,
@@ -96,19 +96,6 @@ const FernSDK = window.FernSDK = {
       const cardList = document.createElement('ul');
 
       cardList.setAttribute('class', 'card-list');
-
-      if (!cards) {
-        notification.innerHTML = 'No wallet found.';
-        notificationElement.setAttribute('class', 'show error');
-        setTimeout(() => notificationElement.removeAttribute('class'), 5000);
-
-        const frondWalletOverlay = document.querySelector('.frond-wallet-overlay');
-
-        frondWalletOverlay.setAttribute('class', 'frond-wallet-overlay');
-        rootElement.onclick = null;
-
-        return;
-      }
 
       cardList.innerHTML = `
         <form id="payment-form" class="flex column">
@@ -242,7 +229,7 @@ const FernSDK = window.FernSDK = {
       );
     };
 
-    const onShow = ({ cards }) => {
+    const onShow = ({ cards = [] }) => {
       const frondWalletOverlay = document.querySelector('.frond-wallet-overlay');
 
       frondWalletOverlay.setAttribute('class', 'frond-wallet-overlay show');
@@ -276,7 +263,7 @@ const FernSDK = window.FernSDK = {
         display: none;
         position: fixed;
         background: rgba(0, 0, 0, .5);
-        left: 220px;
+        left: 16rem;
         right: 0;
         top: 0;
         bottom: 0;
@@ -428,7 +415,7 @@ const FernSDK = window.FernSDK = {
         height: 19rem;
         align-items: center;
         justify-content: space-between;
-        margin-left: 220px;
+        margin-left: 16rem;
         padding: 1rem;
         border: 1px solid black;
         border-radius: 1rem;
